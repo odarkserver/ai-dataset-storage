@@ -1,0 +1,11 @@
+{
+  "system_config": {
+    "value": {
+      "maxSessions": 1000,
+      "maxMessagesPerSession": 100,
+      "autoCleanup": true,
+      "retentionDays": 30
+    },
+    "updatedAt": "2025-10-22T17:47:55.985Z"
+  }
+}

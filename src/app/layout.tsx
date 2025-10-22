@@ -14,24 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
+  title: "ODARK - AI Asisten Operasional Z.ai",
+  description: "ODARK adalah AI asisten internal Z.ai yang elegan, ramah, dan operasional dengan tema hitam-kuning futuristik.",
+  keywords: ["ODARK", "Z.ai", "AI Assistant", "Operasional", "Chatbot", "Next.js", "TypeScript"],
   authors: [{ name: "Z.ai Team" }],
   icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "ODARK - AI Asisten Operasional",
+    description: "AI asisten internal Z.ai yang elegan dan operasional",
     url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    siteName: "ODARK by Z.ai",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "ODARK - AI Asisten Operasional",
+    description: "AI asisten internal Z.ai yang elegan dan operasional",
   },
 };
 
@@ -41,9 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-yellow-400`}
       >
         {children}
         <Toaster />

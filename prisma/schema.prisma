@@ -21,12 +21,188 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model Post {
+model ChatSession {
   id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
+  sessionId String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  messages  ChatMessage[]
+  audits    AuditLog[]
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  sessionId String
+  role      String   // 'user' | 'assistant'
+  content   String
+  timestamp DateTime @default(now())
+  session   ChatSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  
+  @@index([sessionId])
+}
+
+// Internal AI Model Management
+model AIModel {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  version     String
+  type        String   // 'chat' | 'image' | 'search' | 'shell'
+  status      String   @default("active") // 'active' | 'inactive' | 'maintenance'
+  config      Json?    // Model configuration
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usage       ModelUsage[]
+}
+
+model ModelUsage {
+  id        String   @id @default(cuid())
+  modelId   String
+  sessionId String?
+  action    String   // 'chat' | 'generate' | 'search' | 'execute'
+  tokens    Int?
+  responseTime Int?  // in milliseconds
+  success   Boolean  @default(true)
+  error     String?
+  timestamp DateTime @default(now())
+  model     AIModel  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  
+  @@index([modelId])
+  @@index([timestamp])
+}
+
+// Local Storage System
+model LocalStorage {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  type      String   // 'config' | 'cache' | 'temp' | 'user_data'
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([type])
+  @@index([expiresAt])
+}
+
+// System Internal API
+model SystemAPI {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  endpoint    String
+  method      String   // 'GET' | 'POST' | 'PUT' | 'DELETE'
+  description String?
+  status      String   @default("active") // 'active' | 'inactive' | 'deprecated'
+  config      Json?    // API configuration
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  usage       APIUsage[]
+}
+
+model APIUsage {
+  id        String   @id @default(cuid())
+  apiId     String
+  sessionId String?
+  request   Json     // Request data
+  response  Json?    // Response data
+  status    Int      // HTTP status code
+  responseTime Int?  // in milliseconds
+  timestamp DateTime @default(now())
+  api       SystemAPI @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  
+  @@index([apiId])
+  @@index([timestamp])
+}
+
+// Shell Execution & Audit System
+model ShellCommand {
+  id        String   @id @default(cuid())
+  command   String
+  type      String   // 'system' | 'file' | 'network' | 'database'
+  status    String   @default("pending") // 'pending' | 'approved' | 'executed' | 'rejected' | 'failed'
+  result    String?
+  error     String?
+  executedBy String? // User or system that initiated
+  executedAt DateTime?
+  createdAt DateTime @default(now())
+  
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actor       String
+  action      String
+  input       Json?    
+  result      Json?    
+  timestamp   DateTime @default(now())
+  sessionId   String?
+  executionId String?
+  category    String   // 'chat' | 'plugin' | 'commit_api' | 'zhupi_api' | 'security' | 'system'
+  level       String   // 'info' | 'warning' | 'error' | 'critical'
+  metadata    Json?    
+  ipAddress   String?
+  userAgent   String?
+  chatSession ChatSession? @relation(fields: [sessionId], references: [sessionId], onDelete: SetNull)
+  
+  @@index([actor])
+  @@index([action])
+  @@index([category])
+  @@index([level])
+  @@index([timestamp])
+  @@index([sessionId])
+  @@index([executionId])
+}
+
+// GitHub Configuration Management
+model GitHubConfig {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  repository  String
+  branch      String   @default("main")
+  dataPath    String   @default("datasets")
+  isConfigured Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  datasets    DatasetMetadata[]
+  
+  @@index([username])
+  @@index([repository])
+}
+
+// Dataset Metadata Tracking
+model DatasetMetadata {
+  id          String   @id @default(cuid())
+  name        String
+  format      String   // 'json' | 'csv' | 'txt' | 'md'
+  description String?
+  path        String
+  sha         String
+  size        Int?
+  username    String
+  repository  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  config      GitHubConfig @relation(fields: [username], references: [username], onDelete: Cascade)
+  
+  @@index([name])
+  @@index([format])
+  @@index([username])
+  @@index([repository])
+  @@index([createdAt])
+}
+
+// Database Backup Tracking
+model DatabaseBackup {
+  id        String   @id @default(cuid())
+  filename  String
+  path      String
+  size      Int?
+  url       String?
+  type      String   // 'manual' | 'auto'
+  timestamp DateTime @default(now())
+  
+  @@index([type])
+  @@index([timestamp])
 }

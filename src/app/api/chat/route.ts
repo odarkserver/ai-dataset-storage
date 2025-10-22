@@ -1,0 +1,166 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { AgentExecutor } from '@/lib/core/agentExecutor';
+import { AuditLogger } from '@/lib/audit/auditLogger';
+import { LocalStorageService } from '@/lib/internal/local-storage';
+
+export async function POST(request: NextRequest) {
+  try {
+    const { message, conversation, sessionId, userId = 'Guest', executeActions = false, approvedActions = [] } = await request.json();
+
+    if (!message || typeof message !== 'string') {
+      return NextResponse.json(
+        { error: 'Invalid message format' },
+        { status: 400 }
+      );
+    }
+
+    // Initialize services
+    const agentExecutor = AgentExecutor.getInstance();
+    const auditLogger = AuditLogger.getInstance();
+    const localStorageService = LocalStorageService.getInstance();
+
+    // Get user context
+    const userPreferences = await localStorageService.get(`user_prefs_${userId}`);
+    const currentPersona = await localStorageService.get('current_persona');
+    const systemStatus = await localStorageService.get('system_status');
+
+    // Build execution request
+    const executionRequest = {
+      input: message,
+      user: userId,
+      sessionId,
+      context: {
+        sessionId,
+        userId,
+        previousMessages: conversation || [],
+        currentPersona,
+        userPreferences,
+        systemStatus
+      }
+    };
+
+    // Create execution preview
+    const { previews, requiresApproval } = await agentExecutor.createPreview(executionRequest);
+
+    // If actions require approval and not approved, return preview
+    if (requiresApproval && !executeActions) {
+      // Log preview request
+      await auditLogger.logAction(userId, 'preview_requested', {
+        message,
+        previews,
+        requiresApproval,
+        sessionId
+      }, {
+        category: 'chat',
+        level: 'info',
+        metadata: { previewCount: previews.length }
+      });
+
+      return NextResponse.json({
+        response: 'Saya mendeteksi beberapa tindakan yang perlu persetujuan. Berikut preview yang akan saya eksekusi:',
+        previews,
+        requiresApproval,
+        needsApproval: true,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // If actions are approved, execute them
+    if (executeActions && approvedActions.length > 0) {
+      const results = await agentExecutor.execute(executionRequest, approvedActions);
+      
+      // Format execution results
+      const successfulActions = results.filter(r => r.success);
+      const failedActions = results.filter(r => !r.success);
+      
+      let responseMessage = 'Eksekusi selesai. ';
+      
+      if (successfulActions.length > 0) {
+        responseMessage += `Berhasil menjalankan ${successfulActions.length} tindakan: `;
+        responseMessage += successfulActions.map(r => r.action).join(', ');
+      }
+      
+      if (failedActions.length > 0) {
+        responseMessage += ` Gagal menjalankan ${failedActions.length} tindakan.`;
+      }
+
+      return NextResponse.json({
+        response: responseMessage,
+        executionResults: results,
+        executedActions: approvedActions,
+        success: failedActions.length === 0,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Process as regular chat
+    const chatResponse = await agentExecutor.processChat(executionRequest);
+
+    return NextResponse.json({
+      response: chatResponse,
+      previews: previews.length > 0 ? previews : undefined,
+      hasAvailableActions: previews.length > 0,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Chat API Error:', error);
+    
+    // Log error
+    const auditLogger = AuditLogger.getInstance();
+    await auditLogger.logAction('system', 'chat_error', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    }, {
+      category: 'system',
+      level: 'error'
+    });
+    
+    return NextResponse.json(
+      { 
+        error: 'Internal server error',
+        response: 'Sistem mengalami gangguan sementara. Silakan coba lagi dalam beberapa saat.'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    const agentExecutor = AgentExecutor.getInstance();
+    const auditLogger = AuditLogger.getInstance();
+    
+    // Get system status
+    const systemHealth = await auditLogger.getSystemHealth();
+    const availableActions = agentExecutor.getAvailableActions();
+    const auditStats = await auditLogger.getAuditStats(1); // Last 24 hours
+
+    return NextResponse.json({
+      status: 'ODARK Modular Chat API Online',
+      version: '3.0.0',
+      architecture: 'modular',
+      features: {
+        agentExecutor: true,
+        permissionGate: true,
+        pluginSystem: true,
+        commitAPI: true,
+        zhupiAdapter: true,
+        promptBuilder: true,
+        auditLogger: true
+      },
+      availableActions,
+      systemHealth,
+      auditStats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    return NextResponse.json({
+      status: 'ODARK Modular Chat API Online',
+      version: '3.0.0',
+      architecture: 'modular',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+}
