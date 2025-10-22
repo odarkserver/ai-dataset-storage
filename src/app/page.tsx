@@ -35,6 +35,17 @@ export default function ODARKChat() {
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  const formatTime = (date: Date): string => {
+    try {
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return '--:--';
+    }
+  };
+
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
       const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
