@@ -289,7 +289,8 @@ export default function ODARKChat() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API Error: ${response.status} - ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();
