@@ -49,6 +49,9 @@ export default function ODARKChat() {
   }, [messages]);
 
   useEffect(() => {
+    // Initialize on hydration
+    setIsHydrated(true);
+    setMessages([{ ...INITIAL_MESSAGE, timestamp: new Date() }]);
     // Initialize session on mount
     initializeSession();
     // Initialize internal systems
