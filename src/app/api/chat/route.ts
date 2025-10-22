@@ -48,21 +48,34 @@ export async function POST(request: NextRequest) {
     };
 
     // Create execution preview
-    const { previews, requiresApproval } = await agentExecutor.createPreview(executionRequest);
+    let previews = [];
+    let requiresApproval = false;
+
+    try {
+      const previewResult = await agentExecutor.createPreview(executionRequest);
+      previews = previewResult.previews;
+      requiresApproval = previewResult.requiresApproval;
+    } catch (previewError) {
+      console.warn('Failed to create preview:', previewError);
+    }
 
     // If actions require approval and not approved, return preview
     if (requiresApproval && !executeActions) {
-      // Log preview request
-      await auditLogger.logAction(userId, 'preview_requested', {
-        message,
-        previews,
-        requiresApproval,
-        sessionId
-      }, {
-        category: 'chat',
-        level: 'info',
-        metadata: { previewCount: previews.length }
-      });
+      // Log preview request (with error handling)
+      try {
+        await auditLogger.logAction(userId, 'preview_requested', {
+          message,
+          previews,
+          requiresApproval,
+          sessionId
+        }, {
+          category: 'chat',
+          level: 'info',
+          metadata: { previewCount: previews.length }
+        });
+      } catch (auditError) {
+        console.warn('Failed to log action:', auditError);
+      }
 
       return NextResponse.json({
         response: 'Saya mendeteksi beberapa tindakan yang perlu persetujuan. Berikut preview yang akan saya eksekusi:',
