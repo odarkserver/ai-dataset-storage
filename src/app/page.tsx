@@ -15,15 +15,15 @@ interface Message {
   timestamp: Date;
 }
 
+const INITIAL_MESSAGE: Omit<Message, 'timestamp'> = {
+  id: '1',
+  role: 'assistant',
+  content: 'Saya adalah ODARK, AI asisten internal Z.ai. Siap membantu Anda dengan operasional sistem. Ada yang bisa saya bantu?'
+};
+
 export default function ODARKChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Saya adalah ODARK, AI asisten internal Z.ai. Siap membantu Anda dengan operasional sistem. Ada yang bisa saya bantu?',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
