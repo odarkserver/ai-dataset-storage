@@ -63,11 +63,26 @@ export default function ODARKChat() {
     // Initialize on hydration
     setIsHydrated(true);
     setMessages([{ ...INITIAL_MESSAGE, timestamp: new Date() }]);
-    // Initialize session on mount
+    // Initialize database and session
+    initializeDatabase();
     initializeSession();
     // Initialize internal systems
     initializeInternalSystems();
   }, []);
+
+  const initializeDatabase = async () => {
+    try {
+      await fetch('/api/internal/init-db', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Database initialized');
+    } catch (error) {
+      console.error('Failed to initialize database:', error);
+    }
+  };
 
   const initializeInternalSystems = async () => {
     try {
