@@ -88,34 +88,50 @@ export async function POST(request: NextRequest) {
 
     // If actions are approved, execute them
     if (executeActions && approvedActions.length > 0) {
-      const results = await agentExecutor.execute(executionRequest, approvedActions);
-      
-      // Format execution results
-      const successfulActions = results.filter(r => r.success);
-      const failedActions = results.filter(r => !r.success);
-      
-      let responseMessage = 'Eksekusi selesai. ';
-      
-      if (successfulActions.length > 0) {
-        responseMessage += `Berhasil menjalankan ${successfulActions.length} tindakan: `;
-        responseMessage += successfulActions.map(r => r.action).join(', ');
-      }
-      
-      if (failedActions.length > 0) {
-        responseMessage += ` Gagal menjalankan ${failedActions.length} tindakan.`;
-      }
+      try {
+        const results = await agentExecutor.execute(executionRequest, approvedActions);
 
-      return NextResponse.json({
-        response: responseMessage,
-        executionResults: results,
-        executedActions: approvedActions,
-        success: failedActions.length === 0,
-        timestamp: new Date().toISOString()
-      });
+        // Format execution results
+        const successfulActions = results.filter(r => r.success);
+        const failedActions = results.filter(r => !r.success);
+
+        let responseMessage = 'Eksekusi selesai. ';
+
+        if (successfulActions.length > 0) {
+          responseMessage += `Berhasil menjalankan ${successfulActions.length} tindakan: `;
+          responseMessage += successfulActions.map(r => r.action).join(', ');
+        }
+
+        if (failedActions.length > 0) {
+          responseMessage += ` Gagal menjalankan ${failedActions.length} tindakan.`;
+        }
+
+        return NextResponse.json({
+          response: responseMessage,
+          executionResults: results,
+          executedActions: approvedActions,
+          success: failedActions.length === 0,
+          timestamp: new Date().toISOString()
+        });
+      } catch (execError) {
+        console.error('Execution error:', execError);
+        return NextResponse.json({
+          response: 'Maaf, terjadi kesalahan saat menjalankan tindakan. Silakan coba lagi.',
+          success: false,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
 
     // Process as regular chat
-    const chatResponse = await agentExecutor.processChat(executionRequest);
+    let chatResponse = 'Saya memahami pesan Anda, tetapi sedang mengalami kesulitan dalam memproses respons.';
+
+    try {
+      chatResponse = await agentExecutor.processChat(executionRequest);
+    } catch (chatError) {
+      console.warn('Chat processing error:', chatError);
+      // Continue with fallback response
+    }
 
     return NextResponse.json({
       response: chatResponse,
@@ -126,19 +142,23 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    
-    // Log error
-    const auditLogger = AuditLogger.getInstance();
-    await auditLogger.logAction('system', 'chat_error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    }, {
-      category: 'system',
-      level: 'error'
-    });
-    
+
+    // Log error (with error handling)
+    try {
+      const auditLogger = AuditLogger.getInstance();
+      await auditLogger.logAction('system', 'chat_error', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      }, {
+        category: 'system',
+        level: 'error'
+      });
+    } catch (auditError) {
+      console.warn('Failed to log error:', auditError);
+    }
+
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         response: 'Sistem mengalami gangguan sementara. Silakan coba lagi dalam beberapa saat.'
       },
