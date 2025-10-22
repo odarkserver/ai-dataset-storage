@@ -19,10 +19,18 @@ export async function POST(request: NextRequest) {
     const auditLogger = AuditLogger.getInstance();
     const localStorageService = LocalStorageService.getInstance();
 
-    // Get user context
-    const userPreferences = await localStorageService.get(`user_prefs_${userId}`);
-    const currentPersona = await localStorageService.get('current_persona');
-    const systemStatus = await localStorageService.get('system_status');
+    // Get user context (with fallback for database errors)
+    let userPreferences = null;
+    let currentPersona = null;
+    let systemStatus = null;
+
+    try {
+      userPreferences = await localStorageService.get(`user_prefs_${userId}`);
+      currentPersona = await localStorageService.get('current_persona');
+      systemStatus = await localStorageService.get('system_status');
+    } catch (dbError) {
+      console.warn('Database access failed, continuing without preferences:', dbError);
+    }
 
     // Build execution request
     const executionRequest = {
