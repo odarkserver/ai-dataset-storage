@@ -1,31 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { initializeDatabase } from '@/lib/utils/db-init';
 
 export async function POST(request: NextRequest) {
   try {
-    // Try to create a test record to ensure database is initialized
-    await db.localStorage.create({
-      data: {
-        key: '_db_init_test',
-        value: { initialized: true },
-        type: 'config'
-      }
-    }).catch(async () => {
-      // If create fails, try update (already exists)
-      await db.localStorage.update({
-        where: { key: '_db_init_test' },
-        data: { value: { initialized: true } }
+    // Initialize database schema
+    await initializeDatabase();
+
+    // Try to create a test record to ensure database is working
+    try {
+      await db.localStorage.create({
+        data: {
+          key: '_db_init_test_' + Date.now(),
+          value: { initialized: true },
+          type: 'config'
+        }
+      });
+
+      // Clean up test record
+      await db.localStorage.deleteMany({
+        where: { key: { startsWith: '_db_init_test_' } }
       }).catch(() => {
         // Ignore errors
       });
-    });
-
-    // Clean up test record
-    await db.localStorage.deleteMany({
-      where: { key: '_db_init_test' }
-    }).catch(() => {
-      // Ignore errors
-    });
+    } catch (error) {
+      // Database might not be fully ready yet, but that's okay
+      console.warn('Database write test failed, but initialization may still succeed:', error);
+    }
 
     return NextResponse.json({
       success: true,
@@ -34,8 +35,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Database initialization error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
