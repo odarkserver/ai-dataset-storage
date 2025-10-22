@@ -697,10 +697,7 @@ export default function ODARKChat() {
                       }`}>
                         <p className="text-sm leading-relaxed">{message.content}</p>
                         <p className="text-xs text-yellow-700 mt-2">
-                          {message.timestamp.toLocaleTimeString('id-ID', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
+                          {isHydrated ? formatTime(message.timestamp) : '--:--'}
                         </p>
                       </Card>
                     </motion.div>
