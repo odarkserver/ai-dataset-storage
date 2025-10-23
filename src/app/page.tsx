@@ -725,11 +725,11 @@ export default function ODARKChat() {
                 className="flex justify-start"
               >
                 <div className="flex items-start space-x-3 max-w-[80%]">
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, duration: 0.3 }}
-                    className="w-8 h-8 rounded-full bg-yellow-900/30 border border-yellow-700/50 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-400 flex items-center justify-center text-black"
                   >
                     <Bot className="w-4 h-4" />
                   </motion.div>
