@@ -436,7 +436,7 @@ export default function ODARKChat() {
                   disabled={isRunningDiagnostic}
                   variant="outline"
                   size="sm"
-                  className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                  className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isRunningDiagnostic ? (
                     <>
