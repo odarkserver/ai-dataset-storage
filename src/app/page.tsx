@@ -788,7 +788,7 @@ export default function ODARKChat() {
                   exit={{ opacity: 0, scale: 0.8 }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 >
-                  <kbd className="px-2 py-1 text-xs bg-yellow-900/20 border border-yellow-700/30 rounded text-yellow-600">
+                  <kbd className="px-2 py-1 text-xs bg-yellow-400/20 border border-yellow-400 rounded text-yellow-300">
                     Enter
                   </kbd>
                 </motion.div>
