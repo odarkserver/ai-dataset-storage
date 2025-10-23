@@ -506,8 +506,8 @@ export default function ODARKChat() {
                       
                       {result.suggestions && result.suggestions.length > 0 && (
                         <div className="mb-2">
-                          <p className="text-xs text-yellow-600 mb-1">Suggestions:</p>
-                          <ul className="text-xs text-yellow-500 space-y-1">
+                          <p className="text-xs text-white mb-1">Suggestions:</p>
+                          <ul className="text-xs text-yellow-300 space-y-1">
                             {result.suggestions.map((suggestion: string, i: number) => (
                               <li key={i} className="flex items-center">
                                 <span className="w-1 h-1 bg-yellow-500 rounded-full mr-2" />
