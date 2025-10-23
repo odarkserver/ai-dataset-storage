@@ -778,7 +778,7 @@ export default function ODARKChat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ketik perintah atau pertanyaan..."
-                className="bg-black/50 border-yellow-800/30 text-yellow-400 placeholder-yellow-700 focus:border-yellow-600 focus:ring-yellow-600/20 transition-all duration-300"
+                className="bg-black border-2 border-yellow-400 text-white placeholder-yellow-300 focus:border-yellow-300 focus:ring-yellow-400/30 transition-all duration-300"
                 disabled={isLoading}
               />
               {input && (
