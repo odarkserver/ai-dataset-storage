@@ -367,7 +367,7 @@ export default function ODARKChat() {
                 onClick={() => window.location.href = '/github-config'}
                 variant="outline"
                 size="sm"
-                className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20 hover:text-yellow-400"
+                className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
               >
                 <Github className="w-4 h-4 mr-2" />
                 GitHub
