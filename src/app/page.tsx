@@ -809,10 +809,10 @@ export default function ODARKChat() {
             </motion.div>
           </form>
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-white">
               ODARK menjaga privasi dan keamanan data Anda
             </p>
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-white">
               Sistem Operasional v1.0
             </p>
           </div>
