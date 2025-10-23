@@ -560,7 +560,7 @@ export default function ODARKChat() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="border-b border-yellow-900/30 bg-black/80 backdrop-blur-sm"
+          className="border-b-4 border-yellow-400 bg-black backdrop-blur-sm shadow-lg shadow-yellow-800/20"
         >
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between mb-4">
