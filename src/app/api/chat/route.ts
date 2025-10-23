@@ -19,10 +19,18 @@ export async function POST(request: NextRequest) {
     const auditLogger = AuditLogger.getInstance();
     const localStorageService = LocalStorageService.getInstance();
 
-    // Get user context
-    const userPreferences = await localStorageService.get(`user_prefs_${userId}`);
-    const currentPersona = await localStorageService.get('current_persona');
-    const systemStatus = await localStorageService.get('system_status');
+    // Get user context (with fallback for database errors)
+    let userPreferences = null;
+    let currentPersona = null;
+    let systemStatus = null;
+
+    try {
+      userPreferences = await localStorageService.get(`user_prefs_${userId}`);
+      currentPersona = await localStorageService.get('current_persona');
+      systemStatus = await localStorageService.get('system_status');
+    } catch (dbError) {
+      console.warn('Database access failed, continuing without preferences:', dbError);
+    }
 
     // Build execution request
     const executionRequest = {
@@ -40,21 +48,34 @@ export async function POST(request: NextRequest) {
     };
 
     // Create execution preview
-    const { previews, requiresApproval } = await agentExecutor.createPreview(executionRequest);
+    let previews = [];
+    let requiresApproval = false;
+
+    try {
+      const previewResult = await agentExecutor.createPreview(executionRequest);
+      previews = previewResult.previews;
+      requiresApproval = previewResult.requiresApproval;
+    } catch (previewError) {
+      console.warn('Failed to create preview:', previewError);
+    }
 
     // If actions require approval and not approved, return preview
     if (requiresApproval && !executeActions) {
-      // Log preview request
-      await auditLogger.logAction(userId, 'preview_requested', {
-        message,
-        previews,
-        requiresApproval,
-        sessionId
-      }, {
-        category: 'chat',
-        level: 'info',
-        metadata: { previewCount: previews.length }
-      });
+      // Log preview request (with error handling)
+      try {
+        await auditLogger.logAction(userId, 'preview_requested', {
+          message,
+          previews,
+          requiresApproval,
+          sessionId
+        }, {
+          category: 'chat',
+          level: 'info',
+          metadata: { previewCount: previews.length }
+        });
+      } catch (auditError) {
+        console.warn('Failed to log action:', auditError);
+      }
 
       return NextResponse.json({
         response: 'Saya mendeteksi beberapa tindakan yang perlu persetujuan. Berikut preview yang akan saya eksekusi:',
@@ -67,34 +88,50 @@ export async function POST(request: NextRequest) {
 
     // If actions are approved, execute them
     if (executeActions && approvedActions.length > 0) {
-      const results = await agentExecutor.execute(executionRequest, approvedActions);
-      
-      // Format execution results
-      const successfulActions = results.filter(r => r.success);
-      const failedActions = results.filter(r => !r.success);
-      
-      let responseMessage = 'Eksekusi selesai. ';
-      
-      if (successfulActions.length > 0) {
-        responseMessage += `Berhasil menjalankan ${successfulActions.length} tindakan: `;
-        responseMessage += successfulActions.map(r => r.action).join(', ');
-      }
-      
-      if (failedActions.length > 0) {
-        responseMessage += ` Gagal menjalankan ${failedActions.length} tindakan.`;
-      }
+      try {
+        const results = await agentExecutor.execute(executionRequest, approvedActions);
 
-      return NextResponse.json({
-        response: responseMessage,
-        executionResults: results,
-        executedActions: approvedActions,
-        success: failedActions.length === 0,
-        timestamp: new Date().toISOString()
-      });
+        // Format execution results
+        const successfulActions = results.filter(r => r.success);
+        const failedActions = results.filter(r => !r.success);
+
+        let responseMessage = 'Eksekusi selesai. ';
+
+        if (successfulActions.length > 0) {
+          responseMessage += `Berhasil menjalankan ${successfulActions.length} tindakan: `;
+          responseMessage += successfulActions.map(r => r.action).join(', ');
+        }
+
+        if (failedActions.length > 0) {
+          responseMessage += ` Gagal menjalankan ${failedActions.length} tindakan.`;
+        }
+
+        return NextResponse.json({
+          response: responseMessage,
+          executionResults: results,
+          executedActions: approvedActions,
+          success: failedActions.length === 0,
+          timestamp: new Date().toISOString()
+        });
+      } catch (execError) {
+        console.error('Execution error:', execError);
+        return NextResponse.json({
+          response: 'Maaf, terjadi kesalahan saat menjalankan tindakan. Silakan coba lagi.',
+          success: false,
+          timestamp: new Date().toISOString()
+        });
+      }
     }
 
     // Process as regular chat
-    const chatResponse = await agentExecutor.processChat(executionRequest);
+    let chatResponse = 'Saya memahami pesan Anda, tetapi sedang mengalami kesulitan dalam memproses respons.';
+
+    try {
+      chatResponse = await agentExecutor.processChat(executionRequest);
+    } catch (chatError) {
+      console.warn('Chat processing error:', chatError);
+      // Continue with fallback response
+    }
 
     return NextResponse.json({
       response: chatResponse,
@@ -105,19 +142,23 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    
-    // Log error
-    const auditLogger = AuditLogger.getInstance();
-    await auditLogger.logAction('system', 'chat_error', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    }, {
-      category: 'system',
-      level: 'error'
-    });
-    
+
+    // Log error (with error handling)
+    try {
+      const auditLogger = AuditLogger.getInstance();
+      await auditLogger.logAction('system', 'chat_error', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      }, {
+        category: 'system',
+        level: 'error'
+      });
+    } catch (auditError) {
+      console.warn('Failed to log error:', auditError);
+    }
+
     return NextResponse.json(
-      { 
+      {
         error: 'Internal server error',
         response: 'Sistem mengalami gangguan sementara. Silakan coba lagi dalam beberapa saat.'
       },

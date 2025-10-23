@@ -15,15 +15,15 @@ interface Message {
   timestamp: Date;
 }
 
+const INITIAL_MESSAGE: Omit<Message, 'timestamp'> = {
+  id: '1',
+  role: 'assistant',
+  content: 'Saya adalah ODARK, AI asisten internal Z.ai. Siap membantu Anda dengan operasional sistem. Ada yang bisa saya bantu?'
+};
+
 export default function ODARKChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Saya adalah ODARK, AI asisten internal Z.ai. Siap membantu Anda dengan operasional sistem. Ada yang bisa saya bantu?',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>('');
@@ -34,6 +34,17 @@ export default function ODARKChat() {
   const [isRunningDiagnostic, setIsRunningDiagnostic] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const formatTime = (date: Date): string => {
+    try {
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return '--:--';
+    }
+  };
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -49,11 +60,29 @@ export default function ODARKChat() {
   }, [messages]);
 
   useEffect(() => {
-    // Initialize session on mount
+    // Initialize on hydration
+    setIsHydrated(true);
+    setMessages([{ ...INITIAL_MESSAGE, timestamp: new Date() }]);
+    // Initialize database and session
+    initializeDatabase();
     initializeSession();
     // Initialize internal systems
     initializeInternalSystems();
   }, []);
+
+  const initializeDatabase = async () => {
+    try {
+      await fetch('/api/internal/init-db', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      console.log('Database initialized');
+    } catch (error) {
+      console.error('Failed to initialize database:', error);
+    }
+  };
 
   const initializeInternalSystems = async () => {
     try {
@@ -275,7 +304,8 @@ export default function ODARKChat() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API Error: ${response.status} - ${errorData.error || response.statusText}`);
       }
 
       const data = await response.json();
@@ -308,7 +338,7 @@ export default function ODARKChat() {
   return (
     <div className="min-h-screen bg-black text-yellow-400 flex flex-col">
       {/* Header */}
-      <header className="border-b border-yellow-900/30 bg-black/90 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b-4 border-yellow-400 bg-black backdrop-blur-sm sticky top-0 z-50 shadow-lg shadow-yellow-800/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -329,7 +359,7 @@ export default function ODARKChat() {
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold text-yellow-400">ODARK</h1>
-                <p className="text-xs text-yellow-600">AI Asisten Operasional Z.ai</p>
+                <p className="text-xs text-white">AI Asisten Operasional Z.ai</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -337,7 +367,7 @@ export default function ODARKChat() {
                 onClick={() => window.location.href = '/github-config'}
                 variant="outline"
                 size="sm"
-                className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20 hover:text-yellow-400"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Github className="w-4 h-4 mr-2" />
                 GitHub
@@ -346,7 +376,7 @@ export default function ODARKChat() {
                 onClick={toggleDiagnosticPanel}
                 variant="outline"
                 size="sm"
-                className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20 hover:text-yellow-400"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Stethoscope className="w-4 h-4 mr-2" />
                 Diagnostic
@@ -355,7 +385,7 @@ export default function ODARKChat() {
                 onClick={toggleInternalDashboard}
                 variant="outline"
                 size="sm"
-                className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20 hover:text-yellow-400"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Internal
@@ -364,20 +394,20 @@ export default function ODARKChat() {
                 onClick={clearChat}
                 variant="outline"
                 size="sm"
-                className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20 hover:text-yellow-400"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear
               </Button>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Shield className="w-4 h-4" />
                 <span>Terenkripsi</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Database className="w-4 h-4" />
                 <span>Internal</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Cpu className="w-4 h-4" />
                 <span>Online</span>
               </div>
@@ -392,7 +422,7 @@ export default function ODARKChat() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="border-b border-yellow-900/30 bg-black/80 backdrop-blur-sm"
+          className="border-b-4 border-yellow-400 bg-black backdrop-blur-sm shadow-lg shadow-yellow-800/20"
         >
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between mb-4">
@@ -406,7 +436,7 @@ export default function ODARKChat() {
                   disabled={isRunningDiagnostic}
                   variant="outline"
                   size="sm"
-                  className="border-yellow-800/30 text-yellow-600 hover:bg-yellow-900/20"
+                  className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isRunningDiagnostic ? (
                     <>
@@ -445,7 +475,7 @@ export default function ODARKChat() {
                         System Status: {diagnosticResults.overall.toUpperCase()}
                       </span>
                     </div>
-                    <div className="text-xs text-yellow-600">
+                    <div className="text-xs text-white">
                       {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy • {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
                     </div>
                   </div>
@@ -476,8 +506,8 @@ export default function ODARKChat() {
                       
                       {result.suggestions && result.suggestions.length > 0 && (
                         <div className="mb-2">
-                          <p className="text-xs text-yellow-600 mb-1">Suggestions:</p>
-                          <ul className="text-xs text-yellow-500 space-y-1">
+                          <p className="text-xs text-white mb-1">Suggestions:</p>
+                          <ul className="text-xs text-yellow-300 space-y-1">
                             {result.suggestions.map((suggestion: string, i: number) => (
                               <li key={i} className="flex items-center">
                                 <span className="w-1 h-1 bg-yellow-500 rounded-full mr-2" />
@@ -504,7 +534,7 @@ export default function ODARKChat() {
 
                 {/* AI Analysis */}
                 {aiAnalysis && (
-                  <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                  <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                     <h4 className="text-sm font-semibold text-yellow-400 mb-2 flex items-center">
                       <Bot className="w-4 h-4 mr-2" />
                       ODARK AI Analysis
@@ -530,7 +560,7 @@ export default function ODARKChat() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="border-b border-yellow-900/30 bg-black/80 backdrop-blur-sm"
+          className="border-b-4 border-yellow-400 bg-black backdrop-blur-sm shadow-lg shadow-yellow-800/20"
         >
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between mb-4">
@@ -551,7 +581,7 @@ export default function ODARKChat() {
             {internalStats && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* AI Models Status */}
-                <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                   <div className="flex items-center mb-3">
                     <Cpu className="w-4 h-4 mr-2 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-yellow-400">AI Models</h3>
@@ -559,7 +589,7 @@ export default function ODARKChat() {
                   <div className="space-y-2">
                     {internalStats.models.map((model: any) => (
                       <div key={model.id} className="flex justify-between items-center text-xs">
-                        <span className="text-yellow-600">{model.name}</span>
+                        <span className="text-white">{model.name}</span>
                         <div className="flex items-center space-x-2">
                           <span className={`px-2 py-1 rounded ${
                             model.status === 'active' 
@@ -576,7 +606,7 @@ export default function ODARKChat() {
                 </Card>
 
                 {/* Storage Status */}
-                <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                   <div className="flex items-center mb-3">
                     <HardDrive className="w-4 h-4 mr-2 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-yellow-400">Local Storage</h3>
@@ -584,25 +614,25 @@ export default function ODARKChat() {
                   {internalStats.storage ? (
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Total Entries</span>
-                        <span className="text-yellow-400">{internalStats.storage.totalEntries}</span>
+                        <span className="text-white">Total Entries</span>
+                        <span className="text-yellow-300">{internalStats.storage.totalEntries}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Expired</span>
-                        <span className="text-yellow-400">{internalStats.storage.expiredEntries}</span>
+                        <span className="text-white">Expired</span>
+                        <span className="text-yellow-300">{internalStats.storage.expiredEntries}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Storage Path</span>
-                        <span className="text-yellow-400 text-xs">chat.zai</span>
+                        <span className="text-white">Storage Path</span>
+                        <span className="text-yellow-300 text-xs">chat.zai</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-yellow-600">Storage status unavailable</p>
+                    <p className="text-xs text-white">Storage status unavailable</p>
                   )}
                 </Card>
 
                 {/* Shell & Audit Status */}
-                <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                   <div className="flex items-center mb-3">
                     <Terminal className="w-4 h-4 mr-2 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-yellow-400">Shell & Audit</h3>
@@ -610,20 +640,20 @@ export default function ODARKChat() {
                   {internalStats.shell ? (
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Total Commands</span>
-                        <span className="text-yellow-400">{internalStats.shell.commands.total}</span>
+                        <span className="text-white">Total Commands</span>
+                        <span className="text-yellow-300">{internalStats.shell.commands.total}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Pending</span>
-                        <span className="text-yellow-400">{internalStats.shell.commands.pending}</span>
+                        <span className="text-white">Pending</span>
+                        <span className="text-yellow-300">{internalStats.shell.commands.pending}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Success Rate</span>
-                        <span className="text-yellow-400">{internalStats.shell.systemHealth.executionRate.toFixed(1)}%</span>
+                        <span className="text-white">Success Rate</span>
+                        <span className="text-yellow-300">{internalStats.shell.systemHealth.executionRate.toFixed(1)}%</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-yellow-600">Shell status unavailable</p>
+                    <p className="text-xs text-white">Shell status unavailable</p>
                   )}
                 </Card>
               </div>
@@ -658,11 +688,7 @@ export default function ODARKChat() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.1, duration: 0.3 }}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === 'user' 
-                          ? 'bg-yellow-500 text-black' 
-                          : 'bg-yellow-900/30 border border-yellow-700/50'
-                      }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-yellow-400 text-black border-2 border-yellow-400`}
                     >
                       {message.role === 'user' ? (
                         <User className="w-4 h-4" />
@@ -676,17 +702,14 @@ export default function ODARKChat() {
                       transition={{ delay: 0.2, duration: 0.3 }}
                       className={`w-full`}
                     >
-                      <Card className={`p-3 border transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10 ${
-                        message.role === 'user' 
-                          ? 'bg-yellow-500/10 border-yellow-600/30 text-yellow-300' 
-                          : 'bg-black/50 border-yellow-800/30 text-yellow-400'
+                      <Card className={`p-3 border-2 transition-all duration-300 hover:shadow-lg ${
+                        message.role === 'user'
+                          ? 'bg-yellow-400 border-yellow-400 text-black hover:shadow-yellow-400/40'
+                          : 'bg-black border-yellow-400 text-white hover:shadow-yellow-800/40'
                       }`}>
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                        <p className="text-xs text-yellow-700 mt-2">
-                          {message.timestamp.toLocaleTimeString('id-ID', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                          })}
+                        <p className={`text-sm leading-relaxed ${message.role === 'user' ? 'text-black' : 'text-white'}`}>{message.content}</p>
+                        <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-black/70' : 'text-yellow-300'}`}>
+                          {isHydrated ? formatTime(message.timestamp) : '--:--'}
                         </p>
                       </Card>
                     </motion.div>
@@ -702,11 +725,11 @@ export default function ODARKChat() {
                 className="flex justify-start"
               >
                 <div className="flex items-start space-x-3 max-w-[80%]">
-                  <motion.div 
+                  <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, duration: 0.3 }}
-                    className="w-8 h-8 rounded-full bg-yellow-900/30 border border-yellow-700/50 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full bg-yellow-400 border-2 border-yellow-400 flex items-center justify-center text-black"
                   >
                     <Bot className="w-4 h-4" />
                   </motion.div>
@@ -715,7 +738,7 @@ export default function ODARKChat() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2, duration: 0.3 }}
                   >
-                    <Card className="p-3 border bg-black/50 border-yellow-800/30 text-yellow-400">
+                    <Card className="p-3 border-2 border-yellow-400 bg-black text-white shadow-lg shadow-yellow-800/30">
                       <div className="flex items-center space-x-2">
                         <motion.div 
                           animate={{ scale: [1, 1.2, 1] }}
@@ -743,7 +766,7 @@ export default function ODARKChat() {
       </main>
 
       {/* Input Area */}
-      <footer className="border-t border-yellow-900/30 bg-black/90 backdrop-blur-sm sticky bottom-0">
+      <footer className="border-t-4 border-yellow-400 bg-black backdrop-blur-sm sticky bottom-0 shadow-lg shadow-yellow-800/20">
         <div className="container mx-auto px-4 py-4">
           <form onSubmit={handleSubmit} className="flex items-center space-x-3">
             <motion.div 
@@ -755,7 +778,7 @@ export default function ODARKChat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ketik perintah atau pertanyaan..."
-                className="bg-black/50 border-yellow-800/30 text-yellow-400 placeholder-yellow-700 focus:border-yellow-600 focus:ring-yellow-600/20 transition-all duration-300"
+                className="bg-black border-2 border-yellow-400 text-white placeholder-yellow-300 focus:border-yellow-300 focus:ring-yellow-400/30 transition-all duration-300"
                 disabled={isLoading}
               />
               {input && (
@@ -765,7 +788,7 @@ export default function ODARKChat() {
                   exit={{ opacity: 0, scale: 0.8 }}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2"
                 >
-                  <kbd className="px-2 py-1 text-xs bg-yellow-900/20 border border-yellow-700/30 rounded text-yellow-600">
+                  <kbd className="px-2 py-1 text-xs bg-yellow-400/20 border border-yellow-400 rounded text-yellow-300">
                     Enter
                   </kbd>
                 </motion.div>
@@ -786,10 +809,10 @@ export default function ODARKChat() {
             </motion.div>
           </form>
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-white">
               ODARK menjaga privasi dan keamanan data Anda
             </p>
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-white">
               Sistem Operasional v1.0
             </p>
           </div>
