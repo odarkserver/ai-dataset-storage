@@ -5,7 +5,6 @@ import { ZhupiAdapter } from '@/lib/api/zhupiAdapter';
 import { PromptBuilder } from '@/lib/config/promptBuilder';
 import { AuditLogger } from '@/lib/audit/auditLogger';
 import { AIModelService } from '@/lib/internal/ai-models';
-import { PermissionGate } from '@/lib/security/permissionGate';
 
 export interface ExecutionRequest {
   input: string;
