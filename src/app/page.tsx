@@ -707,8 +707,8 @@ export default function ODARKChat() {
                           ? 'bg-yellow-400 border-yellow-400 text-black hover:shadow-yellow-400/40'
                           : 'bg-black border-yellow-400 text-white hover:shadow-yellow-800/40'
                       }`}>
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                        <p className="text-xs text-yellow-700 mt-2">
+                        <p className={`text-sm leading-relaxed ${message.role === 'user' ? 'text-black' : 'text-white'}`}>{message.content}</p>
+                        <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-black/70' : 'text-yellow-300'}`}>
                           {isHydrated ? formatTime(message.timestamp) : '--:--'}
                         </p>
                       </Card>
