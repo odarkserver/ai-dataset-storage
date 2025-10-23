@@ -476,7 +476,7 @@ export default function ODARKChat() {
                       </span>
                     </div>
                     <div className="text-xs text-yellow-600">
-                      {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy • {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
+                      {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy �� {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
                     </div>
                   </div>
                 </Card>
@@ -738,7 +738,7 @@ export default function ODARKChat() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2, duration: 0.3 }}
                   >
-                    <Card className="p-3 border bg-black/50 border-yellow-800/30 text-yellow-400">
+                    <Card className="p-3 border-2 border-yellow-400 bg-black text-white shadow-lg shadow-yellow-800/30">
                       <div className="flex items-center space-x-2">
                         <motion.div 
                           animate={{ scale: [1, 1.2, 1] }}
