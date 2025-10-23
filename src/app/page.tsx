@@ -632,7 +632,7 @@ export default function ODARKChat() {
                 </Card>
 
                 {/* Shell & Audit Status */}
-                <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                   <div className="flex items-center mb-3">
                     <Terminal className="w-4 h-4 mr-2 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-yellow-400">Shell & Audit</h3>
