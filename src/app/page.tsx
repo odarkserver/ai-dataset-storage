@@ -399,15 +399,15 @@ export default function ODARKChat() {
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear
               </Button>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Shield className="w-4 h-4" />
                 <span>Terenkripsi</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Database className="w-4 h-4" />
                 <span>Internal</span>
               </div>
-              <div className="flex items-center space-x-2 text-xs text-yellow-600">
+              <div className="flex items-center space-x-2 text-xs text-white">
                 <Cpu className="w-4 h-4" />
                 <span>Online</span>
               </div>
