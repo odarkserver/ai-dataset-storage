@@ -367,7 +367,7 @@ export default function ODARKChat() {
                 onClick={() => window.location.href = '/github-config'}
                 variant="outline"
                 size="sm"
-                className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Github className="w-4 h-4 mr-2" />
                 GitHub
@@ -376,7 +376,7 @@ export default function ODARKChat() {
                 onClick={toggleDiagnosticPanel}
                 variant="outline"
                 size="sm"
-                className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Stethoscope className="w-4 h-4 mr-2" />
                 Diagnostic
@@ -385,7 +385,7 @@ export default function ODARKChat() {
                 onClick={toggleInternalDashboard}
                 variant="outline"
                 size="sm"
-                className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Internal
@@ -394,7 +394,7 @@ export default function ODARKChat() {
                 onClick={clearChat}
                 variant="outline"
                 size="sm"
-                className="border-2 border-yellow-400 text-white hover:bg-yellow-400 hover:text-black transition-all duration-300"
+                className="bg-yellow-400 border-2 border-yellow-400 text-black hover:bg-yellow-300 hover:border-yellow-300 transition-all duration-300 font-semibold"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Clear
