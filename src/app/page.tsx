@@ -589,7 +589,7 @@ export default function ODARKChat() {
                   <div className="space-y-2">
                     {internalStats.models.map((model: any) => (
                       <div key={model.id} className="flex justify-between items-center text-xs">
-                        <span className="text-yellow-600">{model.name}</span>
+                        <span className="text-white">{model.name}</span>
                         <div className="flex items-center space-x-2">
                           <span className={`px-2 py-1 rounded ${
                             model.status === 'active' 
