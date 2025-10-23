@@ -640,20 +640,20 @@ export default function ODARKChat() {
                   {internalStats.shell ? (
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Total Commands</span>
-                        <span className="text-yellow-400">{internalStats.shell.commands.total}</span>
+                        <span className="text-white">Total Commands</span>
+                        <span className="text-yellow-300">{internalStats.shell.commands.total}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Pending</span>
-                        <span className="text-yellow-400">{internalStats.shell.commands.pending}</span>
+                        <span className="text-white">Pending</span>
+                        <span className="text-yellow-300">{internalStats.shell.commands.pending}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Success Rate</span>
-                        <span className="text-yellow-400">{internalStats.shell.systemHealth.executionRate.toFixed(1)}%</span>
+                        <span className="text-white">Success Rate</span>
+                        <span className="text-yellow-300">{internalStats.shell.systemHealth.executionRate.toFixed(1)}%</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-yellow-600">Shell status unavailable</p>
+                    <p className="text-xs text-white">Shell status unavailable</p>
                   )}
                 </Card>
               </div>
