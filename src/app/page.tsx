@@ -359,7 +359,7 @@ export default function ODARKChat() {
               </motion.div>
               <div>
                 <h1 className="text-xl font-bold text-yellow-400">ODARK</h1>
-                <p className="text-xs text-yellow-600">AI Asisten Operasional Z.ai</p>
+                <p className="text-xs text-white">AI Asisten Operasional Z.ai</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
