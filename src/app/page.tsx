@@ -614,20 +614,20 @@ export default function ODARKChat() {
                   {internalStats.storage ? (
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Total Entries</span>
-                        <span className="text-yellow-400">{internalStats.storage.totalEntries}</span>
+                        <span className="text-white">Total Entries</span>
+                        <span className="text-yellow-300">{internalStats.storage.totalEntries}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Expired</span>
-                        <span className="text-yellow-400">{internalStats.storage.expiredEntries}</span>
+                        <span className="text-white">Expired</span>
+                        <span className="text-yellow-300">{internalStats.storage.expiredEntries}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-yellow-600">Storage Path</span>
-                        <span className="text-yellow-400 text-xs">chat.zai</span>
+                        <span className="text-white">Storage Path</span>
+                        <span className="text-yellow-300 text-xs">chat.zai</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-yellow-600">Storage status unavailable</p>
+                    <p className="text-xs text-white">Storage status unavailable</p>
                   )}
                 </Card>
 
