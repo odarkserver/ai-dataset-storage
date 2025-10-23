@@ -476,7 +476,7 @@ export default function ODARKChat() {
                       </span>
                     </div>
                     <div className="text-xs text-yellow-600">
-                      {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy �� {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
+                      {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy • {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
                     </div>
                   </div>
                 </Card>
@@ -766,7 +766,7 @@ export default function ODARKChat() {
       </main>
 
       {/* Input Area */}
-      <footer className="border-t border-yellow-900/30 bg-black/90 backdrop-blur-sm sticky bottom-0">
+      <footer className="border-t-4 border-yellow-400 bg-black backdrop-blur-sm sticky bottom-0 shadow-lg shadow-yellow-800/20">
         <div className="container mx-auto px-4 py-4">
           <form onSubmit={handleSubmit} className="flex items-center space-x-3">
             <motion.div 
