@@ -581,7 +581,7 @@ export default function ODARKChat() {
             {internalStats && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* AI Models Status */}
-                <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                   <div className="flex items-center mb-3">
                     <Cpu className="w-4 h-4 mr-2 text-yellow-400" />
                     <h3 className="text-sm font-semibold text-yellow-400">AI Models</h3>
