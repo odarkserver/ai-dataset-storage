@@ -688,11 +688,7 @@ export default function ODARKChat() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: 0.1, duration: 0.3 }}
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === 'user' 
-                          ? 'bg-yellow-500 text-black' 
-                          : 'bg-yellow-900/30 border border-yellow-700/50'
-                      }`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-yellow-400 text-black border-2 border-yellow-400`}
                     >
                       {message.role === 'user' ? (
                         <User className="w-4 h-4" />
