@@ -475,7 +475,7 @@ export default function ODARKChat() {
                         System Status: {diagnosticResults.overall.toUpperCase()}
                       </span>
                     </div>
-                    <div className="text-xs text-yellow-600">
+                    <div className="text-xs text-white">
                       {diagnosticResults.summary.total} checks • {diagnosticResults.summary.healthy} healthy • {diagnosticResults.summary.warning} warnings • {diagnosticResults.summary.error} errors • {diagnosticResults.summary.critical} critical
                     </div>
                   </div>
