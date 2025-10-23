@@ -702,10 +702,10 @@ export default function ODARKChat() {
                       transition={{ delay: 0.2, duration: 0.3 }}
                       className={`w-full`}
                     >
-                      <Card className={`p-3 border transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10 ${
-                        message.role === 'user' 
-                          ? 'bg-yellow-500/10 border-yellow-600/30 text-yellow-300' 
-                          : 'bg-black/50 border-yellow-800/30 text-yellow-400'
+                      <Card className={`p-3 border-2 transition-all duration-300 hover:shadow-lg ${
+                        message.role === 'user'
+                          ? 'bg-yellow-400 border-yellow-400 text-black hover:shadow-yellow-400/40'
+                          : 'bg-black border-yellow-400 text-white hover:shadow-yellow-800/40'
                       }`}>
                         <p className="text-sm leading-relaxed">{message.content}</p>
                         <p className="text-xs text-yellow-700 mt-2">
