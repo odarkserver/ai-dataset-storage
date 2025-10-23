@@ -534,7 +534,7 @@ export default function ODARKChat() {
 
                 {/* AI Analysis */}
                 {aiAnalysis && (
-                  <Card className="p-4 border border-yellow-800/30 bg-black/50">
+                  <Card className="p-4 border-2 border-yellow-400 bg-black shadow-lg shadow-yellow-800/30">
                     <h4 className="text-sm font-semibold text-yellow-400 mb-2 flex items-center">
                       <Bot className="w-4 h-4 mr-2" />
                       ODARK AI Analysis
