@@ -79,9 +79,9 @@ export async function POST(request: NextRequest) {
 
       case 'ai_diagnostic':
         // Use AI to analyze and provide recommendations
-        const { diagnostic } = await request.json();
-        
-        if (!diagnostic) {
+        const { diagnostic: diagnosticData } = await request.json();
+
+        if (!diagnosticData) {
           return NextResponse.json(
             { error: 'Diagnostic data is required for AI analysis' },
             { status: 400 }
@@ -89,12 +89,12 @@ export async function POST(request: NextRequest) {
         }
 
         const aiModelService = AIModelService.getInstance();
-        
+
         const analysisPrompt = `
 ${odarkDiagnosticPrompt}
 
 Berikut adalah hasil diagnostik sistem terbaru:
-${JSON.stringify(diagnostic, null, 2)}
+${JSON.stringify(diagnosticData, null, 2)}
 
 Berdasarkan hasil diagnostik ini, berikan analisis mendalam dan rekomendasi tindakan yang harus saya ambil. Fokus pada:
 1. Prioritas masalah yang perlu segera ditangani
