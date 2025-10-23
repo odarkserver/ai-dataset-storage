@@ -338,7 +338,7 @@ export default function ODARKChat() {
   return (
     <div className="min-h-screen bg-black text-yellow-400 flex flex-col">
       {/* Header */}
-      <header className="border-b border-yellow-900/30 bg-black/90 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b-4 border-yellow-400 bg-black backdrop-blur-sm sticky top-0 z-50 shadow-lg shadow-yellow-800/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
